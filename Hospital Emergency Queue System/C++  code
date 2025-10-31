@@ -1,0 +1,151 @@
+#include <iostream>
+using namespace std;
+
+class Node {
+public:
+	int patientID;
+	Node* prev;
+	Node* next;
+	Node(int id) {
+		patientID = id;
+		prev = NULL;
+		next = NULL;
+	}
+};
+
+class ERQueue {
+	Node* head;
+	Node* tail;
+    
+public:
+	ERQueue() {
+		head = NULL;
+		tail = NULL;
+	}
+	
+	~ERQueue() {
+		Node* p = head;
+		cout<<"\n";
+		while (p) {
+			cout << "Deleting Node: " << p->patientID << endl;
+			Node* tmp = p->next;
+			delete p;
+			p = tmp;
+		}
+		cout << "\nAll nodes deleted successfully!" << endl;
+	}
+	
+	void insertAtBeginning(int id) {
+		cout<<"Inserting "<<id<<" at beginning.\n";
+		Node* n = new Node(id);
+		if (!head) {
+			head = tail = n;
+			return;
+		}
+		n->next = head;
+		head->prev = n;
+		head = n;
+	}
+	
+	void insertAtEnd(int id) {
+		cout<<"Inserting "<<id<<" at end.\n";
+		Node* n = new Node(id);
+		if (!tail) {
+			head = tail = n;
+			return;
+		}
+		tail->next = n;
+		n->prev = tail;
+		tail = n;
+	}
+	
+	void insertAtPosition(int id, int pos) {
+		if (pos <= 1) {
+			insertAtBeginning(id);
+			return;
+		}
+		cout<<"Inserting "<<id<<" at position "<<pos<<".\n";
+		Node* p = head;
+		int i = 1;
+		while (p && i < pos - 1) {
+			p = p->next;
+			i++;
+		}
+		if (!p) {
+			insertAtEnd(id);
+			return;
+		}
+		Node* n = new Node(id);
+		n->next = p->next;
+		n->prev = p;
+		if (p->next) p->next->prev = n;
+		else tail = n;
+		p->next = n;
+	}
+	
+	void deleteFromBeginning() {
+		if (!head) {
+			cout<<"No patients to delete.\n";
+			return;
+		}
+		cout<<"Deleting nodes from beginning.\n";
+		Node* t = head;
+		head = head->next;
+		if (head) head->prev = NULL;
+		else tail = NULL;
+		delete t;
+	}
+	
+	void displayForward() {
+		Node* p = head;
+		cout << "NULL";
+		while (p) {
+			cout << " <- [" << p->patientID << "] -> ";
+			p = p->next;
+		}
+		cout << "NULL" << endl;
+	}
+	
+	void displayBackward(){
+		Node* p = tail;
+		cout << "NULL";
+		while (p) {
+			cout << " <- [" << p->patientID << "] -> ";
+			p = p->prev;	
+		}
+		cout << "NULL" << endl;
+	}
+	
+	Node* getHead() { return head; }
+	Node* getTail() { return tail; }
+};
+
+int main(){
+	ERQueue q;
+	
+	q.insertAtEnd(101);
+	q.displayForward();
+	
+	q.insertAtEnd(102);
+	q.displayForward();
+	
+	q.insertAtBeginning(200);
+	q.displayForward();
+	
+	q.insertAtPosition(150, 2);
+	q.displayForward();
+	
+	q.deleteFromBeginning();
+	q.displayForward();
+	
+	q.insertAtEnd(300);
+	q.displayForward();
+	
+	cout << "\nFinal forward traversal: " << endl;
+	q.displayForward();
+	
+	cout << "\nFinal backward traversal: " << endl;
+	q.displayBackward();
+	
+	return 0;
+}
